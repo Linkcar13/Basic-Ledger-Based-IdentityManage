@@ -1,0 +1,53 @@
+{
+    "$id": "https://example.com/identidad.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Identidad",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Identificador único."
+      },
+      "nombres": {
+        "type": "string",
+        "description": "Nombres de la persona."
+      },
+      "apellidos": {
+        "type": "string",
+        "description": "Apellidos de la persona."
+      },
+      "facultad": {
+        "type": "string",
+        "description": "Facultad a la que pertenece."
+      },
+      "semestre": {
+        "type": "string",
+        "description": "Semestre academico actual."
+      },
+      "tipo_de_sangre": {
+        "type": "string",
+        "description": "Tipo de sangre de la persona (opcional)."
+      },
+      "direccion": {
+        "type": "string",
+        "description": "Direccion de la persona (opcional)."
+      },
+      "universidad": {
+        "type": "string",
+        "description": "Universidad de la persona."
+      },
+      "fecha_de_emision": {
+        "type": "string",
+        "description": "Fecha de emisión de la identidad."
+      },
+      "fecha_de_expiracion": {
+        "type": "string",
+        "description": "Fecha hasta la cual la identidad emitida es valida."
+      },
+      "Estado": {
+        "type": "boolean",
+        "description": "Condicion de la identidad en el sistema (habilitada o no habilitada), relacionado con el estado del estudiante (matriculado, no matriculado)."
+      }
+    }
+  }
+  

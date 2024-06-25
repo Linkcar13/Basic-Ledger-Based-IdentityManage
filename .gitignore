@@ -5,6 +5,7 @@
 
 # dependencies
 /app/node_modules
+/Infraestructura/Terraform/.terraform
 
 # testing
 /coverage
