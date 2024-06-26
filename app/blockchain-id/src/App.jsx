@@ -3,6 +3,7 @@ import Home from './components/Home'
 import Features from './components/Features'
 import IssueIdentity from './components/IssueIdentity'
 import ValidateIdentity from './components/ValidateIdentity'
+import RevokeIdentity from './components/RevokeIdentity'
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
           <Features />
           <IssueIdentity />
           <ValidateIdentity />
+          <RevokeIdentity />
       </div>
     </>
   )

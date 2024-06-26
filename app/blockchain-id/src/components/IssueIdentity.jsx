@@ -1,5 +1,5 @@
 import { useState } from "react";
-import perfil from "../assets/usuario.png"
+import perfil from "../assets/perfil.png"
 import {
   Card,
   Input,
@@ -38,7 +38,7 @@ const IssueIdentity = () => {
             });
             if (response.ok) {
               alert('Registro exitoso');
-              // Puedes añadir lógica adicional aquí después de enviar los datos
+
             } else {
               alert('Error al registrar');
             }
@@ -87,11 +87,22 @@ const IssueIdentity = () => {
             }}
           />
           <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
-            Your Faculty
+            University
           </Typography>
           <Input
             size="lg"
             placeholder="ex: EPN"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+              className: "before:content-none after:content-none",
+            }}
+          />
+          <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
+            Your Faculty
+          </Typography>
+          <Input
+            size="lg"
+            placeholder="ex: Sistemas"
             className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
             labelProps={{
               className: "before:content-none after:content-none",
@@ -103,6 +114,17 @@ const IssueIdentity = () => {
           <Input
             size="lg"
             placeholder="ex: First"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+              className: "before:content-none after:content-none",
+            }}
+          />
+          <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
+            Blood Type
+          </Typography>
+          <Input
+            size="lg"
+            placeholder="ex: A+"
             className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
             labelProps={{
               className: "before:content-none after:content-none",
@@ -126,10 +148,12 @@ const IssueIdentity = () => {
       </form>
     </Card>
     </div>
-    <div className="p-2 w-full lg:w-1/2">
-    <Card className="mt-0 w-full flex items-center">
+    <div className="p-2 w-full lg:w-1/2 mt-0 flex justify-center text-center">
+    <Card className="shadow-lg shadow-sky-500/100 rounded-lg w-96 p-5">
       <CardBody>
-        <img src={perfil} alt="default-profile-picture" className="w-48"/>
+      <div className="w-full flex justify-center">
+        <img src={perfil} alt="default-profile-picture" className="w-44"/>
+      </div>
         <Typography className="mb-2 mt-10 text-2xl">
           Data on Blockchain
         </Typography>

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import perfil from "../assets/usuario.png"
+import perfil from "../assets/perfil.png"
+import QRCode from 'qrcode.react';
 import {
   Card,
   Input,
@@ -11,6 +12,14 @@ import {
 } from "@material-tailwind/react";
 
 const ValidateIdentity = () => {
+
+  const [inputValue, setInputValue] = useState('');
+
+  const handleInputchange = (event) =>{
+    setInputValue(event.target.value);
+  };
+
+
   return (
     <div className="mt-20 border-t border-neutral-800">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl mt-10 lg:mt-10 tracking wide text-center">
@@ -23,65 +32,33 @@ const ValidateIdentity = () => {
             <div className="p-2 w-full lg:w-1/2">
       <Card color="transparent" shadow={false} className="w-full flex items-center">
       <Typography color="gray" className="mt-1 font-normal">
-        Nice to meet you! Enter your details to issue your new identity.
+        Nice to meet you! Enter your id to validate your identity.
       </Typography>
       <form  className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
         <div className="mb-1 flex flex-col gap-6">
           <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
-            Your Name
+            Your ID
           </Typography>
           <Input
+            type= "text"
+            value={inputValue}
+            onChange={handleInputchange}
             size="lg"
-            placeholder="ex: Juan Carlos"
+            placeholder="ex: 201820547"
             className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
             labelProps={{
               className: "before:content-none after:content-none",
             }}
           />
-          <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
-            Your Last Name
+          <div className="flex justify-center">
+          <QRCode value={inputValue} size={256} className=" p-2 shadow-sm shadow-sky-500/50 rounded"/>
+          </div>
+          <Typography color="blue-gray" className="-mb-3 text-sky-500 text-center text-sm">
+            Scan QR to Validate
           </Typography>
-          <Input
-            size="lg"
-            placeholder="ex: Doe Ramirez"
-            className=" !border-t-blue-sky-500 focus:!border-t-sky-800"
-            labelProps={{
-              className: "before:content-none after:content-none",
-            }}
-          />
-          <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
-            Your Faculty
+          <Typography color="blue-gray" className="-mb-3 text-center text-sm">
+            or
           </Typography>
-          <Input
-            size="lg"
-            placeholder="ex: EPN"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: "before:content-none after:content-none",
-            }}
-          />
-          <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
-            Semester
-          </Typography>
-          <Input
-            size="lg"
-            placeholder="ex: First"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: "before:content-none after:content-none",
-            }}
-          />
-          <Typography variant="h6" color="blue-gray" className="-mb-3 text-sky-500">
-            Address
-          </Typography>
-          <Input
-            size="lg"
-            placeholder="ex: Av. Ladrón de Guevara"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: "before:content-none after:content-none",
-            }}
-          />
         </div>
         <Button type="submit" className="mt-6 bg-gradient-to-r from-sky-500 to-sky-800" fullWidth>
           Verify Identity
@@ -89,11 +66,13 @@ const ValidateIdentity = () => {
       </form>
     </Card>
     </div>
-    <div className="p-2 w-full lg:w-1/2">
-    <Card className="mt-0 w-full flex items-center">
+    <div className="p-2 w-full lg:w-1/2 mt-0 flex justify-center text-center">
+    <Card className="shadow-lg shadow-sky-500/100 rounded-lg w-96 p-5">
       <CardBody>
-        <img src={perfil} alt="default-profile-picture" className="w-48"/>
-        <Typography className="mb-2 mt-10 text-2xl">
+        <div className="w-full flex justify-center">
+        <img src={perfil} alt="default-profile-picture" className="w-44"/>
+        </div>
+        <Typography className="mb-2 mt-3 text-2xl">
           Data on Blockchain
         </Typography>
         <Typography>
@@ -101,7 +80,7 @@ const ValidateIdentity = () => {
         </Typography>
         <Typography>
             ID:
-        </Typography>
+        </Typography> 
         <Typography>
             ID:
         </Typography>
