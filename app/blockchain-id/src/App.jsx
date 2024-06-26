@@ -4,6 +4,7 @@ import Features from './components/Features'
 import IssueIdentity from './components/IssueIdentity'
 import ValidateIdentity from './components/ValidateIdentity'
 import RevokeIdentity from './components/RevokeIdentity'
+import Footer from './components/Footer'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
           <IssueIdentity />
           <ValidateIdentity />
           <RevokeIdentity />
+          <Footer />
       </div>
     </>
   )

@@ -142,7 +142,7 @@ const IssueIdentity = () => {
             }}
           />
         </div>
-        <Button type="submit" className="mt-6 bg-gradient-to-r from-sky-500 to-sky-800" fullWidth>
+        <Button type="submit" className="mt-6 bg-gradient-to-r from-sky-500 to-sky-800 transform transition duration-500 hover:scale-125" fullWidth>
           Save Data
         </Button>
       </form>

@@ -15,7 +15,7 @@ const RevokeIdentity = () => {
   return (
     <div className="mt-20 border-t border-neutral-800">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl mt-10 lg:mt-10 tracking wide text-center">
-            Test the Indentity Validate  
+            Test the Revoke Indentity  
             <span className="flex justify-center bg-gradient-to-r from-sky-800 to-sky-500 text-transparent bg-clip-text">
                 Smart Contract
             </span> 
@@ -41,7 +41,7 @@ const RevokeIdentity = () => {
             }}
           />
         </div>
-        <Button type="submit" className="mt-6 bg-gradient-to-r from-sky-500 to-sky-800" fullWidth>
+        <Button type="submit" className="mt-6 bg-gradient-to-r from-sky-500 to-sky-800 transform transition duration-500 hover:scale-125" fullWidth>
           Revoke Identity
         </Button>
       </form>
