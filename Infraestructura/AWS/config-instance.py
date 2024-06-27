@@ -1,62 +1,51 @@
 import subprocess
 import json
-import os
+import re
+import time
 import boto3
+import os
 
 def run_terraform(terraform_dir):
-    # Cambia el directorio de trabajo a la carpeta de Terraform
     os.chdir(terraform_dir)
-
-    # Inicializa Terraform
-    subprocess.run(["terraform", "init"], check=True)
-
-    # Aplica la configuración de Terraform y captura la salida
-    result = subprocess.run(["terraform", "apply", "-auto-approve", "-json"], capture_output=True, text=True, check=True)
     
-    # Vuelve al directorio original
-    os.chdir("..")
-
-    # Guardar la salida en una variable para su análisis
-    output = result.stdout
-
-    # Extraer solo la parte JSON de la salida
-    json_output = extract_json_from_output(output)
-
-    # Cargar el JSON extraído
-    apply_output = json.loads(json_output)
-
-    # Buscar el instance_id en el JSON
-    instance_id = None
-    for resource in apply_output['resource_changes']:
-        if resource['type'] == 'aws_instance':
-            instance_id = resource['change']['after']['id']
-            break
-
-    if instance_id is None:
+    # Initialize and apply Terraform configuration
+    init_result = subprocess.run(["terraform", "init"], capture_output=True, text=True)
+    print(init_result.stdout)
+    
+    apply_result = subprocess.run(["terraform", "apply", "-auto-approve"], capture_output=True, text=True)
+    output = apply_result.stdout
+    print(output)
+    
+    # Extract instance_id from Terraform apply output using regular expressions
+    match = re.search(r'aws_instance\.server-blockchain: Creation complete after \d+s \[id=(i-[a-z0-9]+)\]', output)
+    if match:
+        instance_id = match.group(1)
+        return instance_id
+    else:
         raise Exception("No se pudo encontrar el instance_id en la salida de Terraform.")
 
-    return instance_id
+def wait_for_instance_running(instance_id):
+    ec2_client = boto3.client('ec2',region_name="us-east-1" )
+    waiter = ec2_client.get_waiter('instance_running')
+    waiter.wait(InstanceIds=[instance_id])
+    print(f"Instance {instance_id} is now running.")
 
-def extract_json_from_output(output):
-    """
-    Extraer solo la parte JSON de la salida de Terraform
-    """
-    json_start = output.find('{')
-    json_end = output.rfind('}') + 1
-    json_output = output[json_start:json_end]
-    return json_output
+def restart_instance(instance_id):
+    ec2_client = boto3.client('ec2', region_name="us-east-1")
+    print(f"Restarting instance {instance_id}...")
+    ec2_client.reboot_instances(InstanceIds=[instance_id])
+    print(f"Instance {instance_id} rebooted successfully.")
 
 def execute_bash_script(instance_id):
-    ssm_client = boto3.client('ssm')
-
-    bash_script = """##!/bin/bash
+    ssm_client = boto3.client('ssm', )
+    bash_script = '''#!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 #uninstall versions of docker
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do apt-get remove -y $pkg; done
 #Install docker and dependencies
-apt-get install -y  ca-certificates curl
-sudo install -y  -m 0755 -d /etc/apt/keyrings
+apt-get install -y ca-certificates curl
+sudo install -y -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 # Add the repository to Apt sources:
@@ -80,7 +69,7 @@ curl -sSLO https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/ins
 ./install-fabric.sh
 wget https://github.com/hyperledger/fabric/releases/download/v2.5.8/hyperledger-fabric-linux-amd64-2.5.8.tar.gz
 mkdir /home/ubuntu/hyperledger/hyperledger-binaries
-tar -zxf hyperledger-fabric-linux*.tar.gz -C /home/ubuntu/hyperledger/hyperledger-binaries  && cd /home/ubuntu/hyperledger/hyperledger-binaries
+tar -zxf hyperledger-fabric-linux*.tar.gz -C /home/ubuntu/hyperledger/hyperledger-binaries && cd /home/ubuntu/hyperledger/hyperledger-binaries
 cd bin && sudo cp * /usr/bin && cd ..
 cd ..
 #git clone https://github.com/hyperledger/fabric-samples.git
@@ -98,36 +87,33 @@ source .profile
 sleep 180
 ff --help
 ff init test 2 -b "fabric" -p 8000
-ff start test -v -b
-"""
-
+ff start test -v -b'''
     response = ssm_client.send_command(
         InstanceIds=[instance_id],
         DocumentName="AWS-RunShellScript",
-        Parameters={'commands': [bash_script]}
+        Parameters={'commands': [bash_script]},
+        TimeoutSeconds=600,
     )
-
-    command_id = response['Command']['CommandId']
-
-    # Esperar a que el comando se complete
-    ssm_client.get_waiter('command_executed').wait(
-        CommandId=command_id,
-        InstanceId=instance_id
-    )
-
-    # Obtener la salida del comando
-    output = ssm_client.get_command_invocation(
-        CommandId=command_id,
-        InstanceId=instance_id
-    )
-
-    print("Command Output:")
-    print(output['StandardOutputContent'])
-    print("Command Errors:")
-    print(output['StandardErrorContent'])
+    #command_id = response['Command']['CommandId']
+    print("Command sent successfully.")
+    return response
 
 if __name__ == "__main__":
-    terraform_directory = "../Terraform/"  # Directorio que contiene el script de Terraform
+    terraform_directory = "../Terraform/"
     instance_id = run_terraform(terraform_directory)
     print(f"Created instance with ID: {instance_id}")
-    execute_bash_script(instance_id)
+
+    time.sleep(300)
+
+    wait_for_instance_running(instance_id)
+    
+    # Restart the instance before executing bash script
+    restart_instance(instance_id)
+    print("Waiting for instance to restart...")
+    time.sleep(300)  # Adjust time as necessary
+    print("Executing bash script...")
+
+    try:
+        execute_bash_script(instance_id)
+    except Exception as e:
+        print(f"Error executing bash script: {e}")

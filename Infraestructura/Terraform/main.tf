@@ -121,6 +121,34 @@ resource "aws_security_group" "tesis_blokchain_server_security_group" {
 
 }
 
+// Configuration for instance
+
+//key-pair generation
+resource "tls_private_key" "key-proy" {
+  algorithm = "RSA"
+  rsa_bits = 4096
+
+}
+
+#WARNING!!!
+#Save the priv data on local file
+resource "local_file" "private_serv_key" {
+  content = tls_private_key.key-proy.private_key_openssh
+  file_permission = 0400
+  filename = "../Terraform/keys/id_rsa"
+}
+
+resource "local_file" "public_serv_key" {
+  content = tls_private_key.key-proy.public_key_openssh
+  file_permission = 0400
+  filename = "../Terraform/keys/id_rsa.pub"
+}
+
+resource "aws_key_pair" "deployer" {
+  key_name = "deployer-key"
+  public_key = tls_private_key.key-proy.public_key_openssh
+}
+
 //Bloque de datos se usa para definir informacion especifica de un recurso
 data "aws_ami" "ubuntu" {
   most_recent = "true"
@@ -151,6 +179,18 @@ resource "aws_instance" "server-blockchain" {
       network_interface_id = aws_network_interface.tesis_network_interface.id
       device_index = 0
     }
+
+/*     user_data = <<-EOF
+                    #!/bin/bash
+                    apt-get update -y
+                    apt-get upgrade -y
+                    apt-get install snapd
+                    snap install amazon-ssm-agent --classic
+                    sleep 60
+                    sudo reboot now
+                  EOF */
+
+    key_name = aws_key_pair.deployer.key_name
 
     tags = {
       Name = "Server-Prod-Blockchain"
